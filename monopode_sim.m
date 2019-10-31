@@ -2,7 +2,9 @@ clear;
 clc;
 sim_panel = figure("Name","Monopode Simulation",'NumberTitle','off');
 
-setup_environment([0 5]);
+leg_length = 1;
+angle = pi/6;
+drawWorld([0 5],angle,leg_length);
 mode = 0;
 time_span = 0:0.01:10;
 
@@ -10,6 +12,7 @@ x = ones(1,2);
 x(1,1) = 5;
 x(1,2) = 0;
 count = 1;
+
 
 while (1)
     i = 1;
@@ -27,7 +30,7 @@ while (1)
     count = size(x,1);
     x0 = x(count,1);
     while(i <= count)
-        setup_environment([0 x(i,1)]);
+        drawWorld([0 x(i,1)], angle, leg_length);
         pause(0.01)
         i = i + 1;
     end
@@ -57,29 +60,24 @@ isterminal = 1;
 direction  = 0;
 end
 
-function [] = setup_environment(init_pos)
+function [] = drawWorld(pos,angle,length)
     clf;
     hold on;
-    drawGround();
-    drawRobot(init_pos,1);
+    rectangle('Position',[-10 -1 100 1],'FaceColor',[0.4 0.3 0.1])
+    drawRobot(pos,angle,length);
     axis square;
     axis([-1 10 -1 10]);
 end
 
-function [] = drawGround()
-    rectangle('Position',[-10 -1 100 1],'FaceColor',[0.4 0.3 0.1])
-end
 
-function [] = drawRobot(pos,length)
+function [] = drawRobot(pos,angle,len)
     circle(pos(1),pos(2),0.5,'r');
-    leg_pos = pos + [0 -0.5];
-    if (leg_pos(2) - length < 0)
-       length =  leg_pos(2);
-    end
-    L1 = length/3; L2 = 2*L1;
-    plot([leg_pos(1) leg_pos(1)], [leg_pos(2) leg_pos(2)-L1]);    
-    plot((leg_pos(1) + sin(linspace(0,8*pi))/12 ) , linspace(leg_pos(2)-L1,leg_pos(2)-L2))
-    plot([leg_pos(1) leg_pos(1)], [leg_pos(2)-L2 leg_pos(2)-L2-L1]); 
+    angle = (angle + pi/2);
+    if (angle > pi); angle=angle-2*pi; end
+    leg_pos = pos - 0.5*[cos(angle) sin(angle)];
+    end_point = [len*cos(angle) len*sin(angle)];
+    if (leg_pos(2) - (len*sin(angle)) < 0); end_point(2) = leg_pos(2); end
+    plot([leg_pos(1) leg_pos(1)-end_point(1)], [leg_pos(2) leg_pos(2)-end_point(2)],'color','black');
 end
 
 function circles = circle(x,y,r,c)
