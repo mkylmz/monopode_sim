@@ -1,9 +1,9 @@
 clear;
 clc;
 
-xinit = 0; yinit = 5;
-angle = pi*(90/180);leg_length = 1; m=1; b=0.5; k=400;
-myrobot = MyRobot(0,5,0.5,leg_length,angle,m,b,k);
+xinit = 0; yinit = 5; radius = 0.5;
+angle = -100*(pi/180);leg_length = 1; m=1; b=0.5; k=400;
+myrobot = MyRobot(xinit,yinit,radius,leg_length,angle,m,b,k);
 myrobot.draw();
 
 mode = 0;
@@ -15,6 +15,8 @@ count = 1;
 
 while (1)
     i = 1;
+    if (myrobot.angle > pi); myrobot.angle=myrobot.angle-2*pi; end
+    if (myrobot.angle < -pi); myrobot.angle=2*pi+myrobot.angle; end
     if (mode == 0)
         opt   = odeset('Events', @(t,y) LandingEvent(t,y,myrobot));
         [t,states] = ode45(@flight_func,time_span,[tstate.x tstate.xdot tstate.y tstate.ydot],opt);
@@ -22,6 +24,7 @@ while (1)
         fstates = fstate_converter(states,count);
         for i =  1:count
             myrobot = myrobot.get_fstate(fstates(i));
+            myrobot.angle = myrobot.angle + i*(angle-myrobot.angle)/count;
             myrobot.draw();
             pause(0.01)
         end
@@ -37,7 +40,7 @@ while (1)
             myrobot.draw();
             pause(0.01);
         end
-        tstate = calcCartesianCoordinates(sstates(i),tstate(5),tstate(6));
+        tstate = calcCartesianCoordinates(sstates(i),myrobot,tstate(5),tstate(6));
         mode = 0;
     end
 end
@@ -51,7 +54,7 @@ function dpos = flight_func(t,state)
 end
 
 function [value, isterminal, direction] = LandingEvent(t, state, myrobot)
-    value      = (state(3) < (myrobot.leg_length+myrobot.radius)*sin(myrobot.angle));
+    value      = (state(3) < (myrobot.leg_length+myrobot.radius)*-sin(myrobot.angle)) && state(4) < 0;
     isterminal = 1;
     direction  = 0;
 end

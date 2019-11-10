@@ -20,13 +20,13 @@ classdef FlightState
         end
         
         function tstate = calcPolarCoordinates(fstate,myrobot)
-            %METHOD1 Summary of this method goes here
+            %calcPolarCoordinates Summary of this method goes here
             %   Detailed explanation goes here
-            rdot = fstate.ydot*sin(myrobot.angle) + fstate.xdot*cos(myrobot.angle);
-            qdot = fstate.ydot*cos(myrobot.angle) + fstate.xdot*sin(myrobot.angle);
-            landx = fstate.x-(myrobot.leg_length+myrobot.radius)*cos(myrobot.angle);
-            landy = fstate.y-(myrobot.leg_length+myrobot.radius)*sin(myrobot.angle);
-            tstate = [myrobot.leg_length rdot myrobot.angle qdot landx landy];
+            rdot = fstate.xdot*cos(myrobot.angle) - fstate.ydot*sin(myrobot.angle);
+            qdot = - fstate.ydot*cos(myrobot.angle) + fstate.xdot*sin(myrobot.angle);
+            landx = fstate.x+(myrobot.leg_length+myrobot.radius)*cos(myrobot.angle);
+            landy = fstate.y+(myrobot.leg_length+myrobot.radius)*sin(myrobot.angle);
+            tstate = [myrobot.leg_length rdot pi+myrobot.angle qdot landx landy];
         end
     end
 end

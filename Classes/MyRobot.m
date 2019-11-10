@@ -32,7 +32,7 @@ classdef MyRobot
         end
         
         function [] = draw(myrobot)
-            %METHOD1 Summary of this method goes here
+            %draw Summary of this method goes here
             %   Detailed explanation goes here
             clf;
             hold on;
@@ -44,28 +44,27 @@ classdef MyRobot
             plot(x_circle, y_circle);
             fill(x_circle, y_circle, 'r')
             %Draw Leg
-            my_angle = -(pi-myrobot.angle);
-            leg_pos = [myrobot.x myrobot.y] + myrobot.radius*[cos(my_angle) sin(my_angle)];
-            end_point = [leg_pos(1)+myrobot.cur_length*cos(my_angle) leg_pos(2)+myrobot.cur_length*sin(my_angle)];
+            leg_pos = [myrobot.x myrobot.y] + myrobot.radius*[cos(myrobot.angle) sin(myrobot.angle)];
+            end_point = [leg_pos(1)+myrobot.cur_length*cos(myrobot.angle) leg_pos(2)+myrobot.cur_length*sin(myrobot.angle)];
             plot([leg_pos(1) end_point(1)], [leg_pos(2) end_point(2)],'color','black');
             %Better View
-            axis square;
-            axis([-1 10 -1 10]);
+            set(gcf,'Position',[1500 700 1040 420])
+            axis([-1 25 -1 10]);
         end
         
         function myrobot = get_fstate(myrobot,fstate)
-            %METHOD1 Summary of this method goes here
+            %get_fstate Summary of this method goes here
             %   Detailed explanation goes here
             myrobot.x = fstate.x;
             myrobot.y = fstate.y;
         end
         
         function myrobot = get_sstate(myrobot,sstate,landx,landy)
-            %METHOD1 Summary of this method goes here
+            %get_sstate Summary of this method goes here
             %   Detailed explanation goes here
             myrobot.x = landx + (sstate.r+myrobot.radius)*cos(sstate.Q);
             myrobot.y = landy + (sstate.r+myrobot.radius)*sin(sstate.Q);
-            myrobot.angle = sstate.Q;
+            myrobot.angle = pi+sstate.Q;
             myrobot.cur_length = sstate.r; 
         end
     end
