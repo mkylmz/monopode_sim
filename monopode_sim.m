@@ -1,61 +1,82 @@
 clear;
 clc;
-sim_panel = figure("Name","Monopode Simulation",'NumberTitle','off');
+sim_panel = figure(1);
 
-leg_length = 1;
-angle = pi/6;
+leg_length = 1; m=1; b=0.5; k=400;
+angle = pi*(90/180);
 drawWorld([0 5],angle,leg_length);
 mode = 0;
-time_span = 0:0.01:10;
+time_span = 0:0.02:10;
 
-x = ones(1,2);
-x(1,1) = 5;
-x(1,2) = 0;
+trans_state = ones(1,4);
+trans_state(1,1) = 5;
+trans_state(1,2) = 0;
+trans_state(1,3) = 0;
+trans_state(1,4) = 0;
 count = 1;
 
 
 while (1)
     i = 1;
-    pos = x(count,1);
-    vel = x(count,2);
     if (mode == 0)
-        opt   = odeset('Events', @LandingEvent);
-        [t,x] = ode45(@air_func,time_span,[pos vel],opt);
+        opt   = odeset('Events', @(t,y) LandingEvent(t,y,angle,leg_length));
+        [t,flight_state] = ode45(@flight_func,time_span,trans_state,opt);
+        count = size(flight_state,1);
+        while(i <= count)
+            drawWorld([flight_state(i,3) flight_state(i,1)], angle, leg_length);
+            pause(0.01)
+            i = i + 1;
+        end
+        rdot = flight_state(count,2)*sin(angle) + flight_state(count,4)*cos(angle);
+        qdot = flight_state(count,2)*cos(angle) + flight_state(count,4)*sin(angle);
+        landy = flight_state(count,1)-(leg_length+0.5)*sin(angle);
+        landx = flight_state(count,3)-(leg_length+0.5)*cos(angle);
+        trans_state = [leg_length rdot angle qdot];
         mode = 1;
     elseif (mode == 1)
-        opt   = odeset('Events', @TakeoffEvent);
-        [t,x] = ode45(@(t,x) ground_func(t,x,x0),time_span,[pos vel],opt);
+        opt   = odeset('Events', @(t,y) TakeoffEvent(t,y,leg_length));
+        [t,stance_state] = ode45(@(t,state) stance(t,state,leg_length,m,b,k),time_span,trans_state,opt);
+        count = size(stance_state,1);
+        while(i <= count)
+            xnew = landx + (stance_state(i,1)+0.5)*cos(stance_state(i,3));
+            ynew = landy + (stance_state(i,1)+0.5)*sin(stance_state(i,3));
+            drawWorld([xnew ynew], stance_state(i,3), stance_state(i,1));
+            pause(0.01)
+            i = i + 1;
+        end
+        trans_state = zeros(1,4);
+        trans_state(1) = ynew;
+        trans_state(2) = stance_state(count,2)*cos(angle) + stance_state(count,4)*sin(angle);
+        trans_state(3) = xnew;
+        trans_state(4) = stance_state(count,2)*sin(angle) - stance_state(count,4)*cos(angle);
         mode = 0;
     end
-    count = size(x,1);
-    x0 = x(count,1);
-    while(i <= count)
-        drawWorld([0 x(i,1)], angle, leg_length);
-        pause(0.01)
-        i = i + 1;
-    end
 end
 
-function dx = air_func(t,x)
-    dx = zeros(2,1);
-    dx(1) = x(2);
-    dx(2) = -9.81 - ( 1 * x(2) )/100;
+function dpos = flight_func(t,pos)
+    dpos = zeros(2,1);
+    dpos(1) = pos(2);
+    dpos(2) = -9.81;
+    dpos(3) = pos(4);
+    dpos(4) = 0;
 end
 
-function [value, isterminal, direction] = LandingEvent(t, x)
-value      = (x(1) < 1.5);
+function [value, isterminal, direction] = LandingEvent(t, y, angle,leg_length)
+value      = (y(1) < (leg_length+0.5)*sin(angle));
 isterminal = 1;
 direction  = 0;
 end
 
-function dx = ground_func(t,x,x0)
-    dx = zeros(2,1);
-    dx(1) = x(2);
-    dx(2) = - 9.81 - 200*(x(1) - x0) - 1 * x(2);
+function dstate = stance(t,state,r0,m,b,k)
+    dstate = zeros(4,1);
+    dstate(1) = state(2);
+    dstate(2) = state(1)*(state(4)^2)-9.81*sin(state(3))-(b/m)*state(2)+(k/m)*(r0-state(1));
+    dstate(3) = state(4);
+    dstate(4) = (-9.81*state(1)*cos(state(3))-2*state(1)*state(2)*state(4))/(state(1)^2);
 end
 
-function [value, isterminal, direction] = TakeoffEvent(t, x)
-value      = (x(1) > 1.51);
+function [value, isterminal, direction] = TakeoffEvent(t, y, leg_length)
+value      = (y(1) > leg_length);
 isterminal = 1;
 direction  = 0;
 end
@@ -69,15 +90,12 @@ function [] = drawWorld(pos,angle,length)
     axis([-1 10 -1 10]);
 end
 
-
 function [] = drawRobot(pos,angle,len)
     circle(pos(1),pos(2),0.5,'r');
-    angle = (angle + pi/2);
-    if (angle > pi); angle=angle-2*pi; end
-    leg_pos = pos - 0.5*[cos(angle) sin(angle)];
-    end_point = [len*cos(angle) len*sin(angle)];
-    if (leg_pos(2) - (len*sin(angle)) < 0); end_point(2) = leg_pos(2); end
-    plot([leg_pos(1) leg_pos(1)-end_point(1)], [leg_pos(2) leg_pos(2)-end_point(2)],'color','black');
+    my_angle = -(pi-angle);
+    leg_pos = pos + 0.5*[cos(my_angle) sin(my_angle)];
+    end_point = [leg_pos(1)+len*cos(my_angle) leg_pos(2)+len*sin(my_angle)];
+    plot([leg_pos(1) end_point(1)], [leg_pos(2) end_point(2)],'color','black');
 end
 
 function circles = circle(x,y,r,c)

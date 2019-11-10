@@ -3,7 +3,7 @@ clc;
 sim_panel = figure(1);
 
 leg_length = 3; m=1; b=0.5; k=400;
-angle = -pi*(60/180);
+angle = pi*(60/180);
 time_span = 0:0.02:30;
 
 initial_state = [leg_length 0 angle 0];
