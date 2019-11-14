@@ -1,32 +1,37 @@
 clear;
 clc;
 
-xinit = 0; yinit = 5; radius = 0.5;
-angle = -92*(pi/180);leg_length = 1; m=4; b=1; k=800;
-myrobot = MyRobot(xinit,yinit,radius,leg_length,angle,m,b,k);
-myrobot.draw();
+init_x = 0; init_xdot = 0; init_y = 2; init_ydot = 0; init_radius = 0.5;
+init_leg_length = 1; init_m=40; init_b=0; init_k=10000; init_time = 0;
+kxdot = 0.005; xdotdesired = 1;
+desired_angle = real(asin( (kxdot * (init_xdot - xdotdesired))/init_leg_length ))-pi/2;
+myrobot = MyRobot(init_x,init_y,init_radius,init_leg_length,-pi/2,init_m,init_b,init_k);
 
 mode = 0;
-time_span = 0:0.01:10;
-
-tstate = FlightState(xinit,0,yinit,0);
-count = 1;
-
+tstate = FlightState(init_x,init_xdot,init_y,init_ydot);
+datas = [init_time init_x init_xdot init_y -pi/2];
+myrobot.draw(datas);
+total_time = 0;
+step_time = 0.02;
+time_span = 0:step_time:10;
+clear init_*;
 
 while (1)
-    i = 1;
+    if (total_time > 10); return;  end
     if (myrobot.angle > pi); myrobot.angle=myrobot.angle-2*pi; end
     if (myrobot.angle < -pi); myrobot.angle=2*pi+myrobot.angle; end
     if (mode == 0)
-        opt   = odeset('Events', @(t,y) LandingEvent(t,y,myrobot,angle));
+        opt   = odeset('Events', @(t,y) LandingEvent(t,y,myrobot,desired_angle));
         [t,states] = ode45(@flight_func,time_span,[tstate.x tstate.xdot tstate.y tstate.ydot],opt);
         count = size(states,1);
         fstates = fstate_converter(states,count);
         for i =  1:count
             myrobot = myrobot.get_fstate(fstates(i));
-            myrobot.angle = myrobot.angle + i*(angle-myrobot.angle)/count;
-            myrobot.draw();
-            pause(0.01)
+            myrobot.angle = myrobot.angle + i*(desired_angle-myrobot.angle)/count;
+            total_time = total_time + step_time;
+            datas = [datas; total_time myrobot.x fstates(i).xdot myrobot.y myrobot.angle];
+            myrobot.draw(datas);
+            pause(step_time)
         end
         tstate = fstates(i).calcPolarCoordinates(myrobot);
         mode = 1;
@@ -37,10 +42,14 @@ while (1)
         sstates = sstate_converter(states,count);
         for i =  1:count
             myrobot = get_sstate(myrobot,sstates(i),tstate(5),tstate(6));
-            myrobot.draw();
-            pause(0.01);
+            temp = calcCartesianCoordinates(sstates(i),myrobot,tstate(5),tstate(6));
+            total_time = total_time + step_time;
+            datas = [datas; total_time temp.x temp.xdot temp.y myrobot.angle];
+            myrobot.draw(datas);
+            pause(step_time);
         end
         tstate = calcCartesianCoordinates(sstates(i),myrobot,tstate(5),tstate(6));
+        desired_angle = real(asin( (tstate.xdot*count*0.01 +kxdot * (tstate.xdot - xdotdesired))/myrobot.leg_length ))-pi/2;
         mode = 0;
     end
 end

@@ -31,10 +31,17 @@ classdef MyRobot
             obj.sim_panel = figure(1);
         end
         
-        function [] = draw(myrobot)
+        function [] = draw(myrobot,datas)
             %draw Summary of this method goes here
             %   Detailed explanation goes here
             clf;
+            set(gcf,'Position',[200 100 1040 1100])
+
+            % Split figure plots
+            tiledlayout(12,1)
+            
+            %-------------------Draw Simulation----------------------------
+            nexttile([4 1])
             hold on;
             rectangle('Position',[-10 -1 100 1],'FaceColor',[0.4 0.3 0.1])
             %Draw CoM
@@ -48,8 +55,28 @@ classdef MyRobot
             end_point = [leg_pos(1)+myrobot.cur_length*cos(myrobot.angle) leg_pos(2)+myrobot.cur_length*sin(myrobot.angle)];
             plot([leg_pos(1) end_point(1)], [leg_pos(2) end_point(2)],'color','black');
             %Better View
-            set(gcf,'Position',[1500 700 1040 420])
             axis([-1 25 -1 10]);
+            
+            %-------------------Plot x(m) vs t(s)--------------------------
+            nexttile([2 1])
+            plot(datas(:,1),datas(:,2));
+            axis([0 10 -1 25]);
+            
+            %-------------------Plot xdot(m/s) vs t(s)--------------------------
+            nexttile([2 1])
+            plot(datas(:,1),datas(:,3));
+            axis([0 10 -3 3]);
+            
+            %-------------------Plot y(m) vs t(s)--------------------------
+            nexttile([2 1])
+            plot(datas(:,1),datas(:,4));
+            axis([0 10 0 inf]);
+            
+            %-------------------Plot Q(rad) vs t(s)--------------------------
+            nexttile([2 1])
+            plot(datas(:,1),datas(:,5));
+            axis([0 10 -pi 0]);
+            
         end
         
         function myrobot = get_fstate(myrobot,fstate)
