@@ -19,6 +19,10 @@ classdef MyRobot
         CoM_border
         CoM_fill
         Leg_obj
+        plot1
+        plot2
+        plot3
+        plot4
     end
     
     methods
@@ -66,25 +70,25 @@ classdef MyRobot
             %-------------------Plot x(m) vs t(s)--------------------------
             nexttile(3)
             hold on;
-            plot(myrobot.time,myrobot.x,'-k.', 'MarkerSize',2);
+            myrobot.plot1 = plot(myrobot.time,myrobot.x,'-k.', 'MarkerSize',2);
             axis([0 10 -1 25]);
             
             %-------------------Plot xdot(m/s) vs t(s)--------------------------
             nexttile(4)
             hold on;
-            plot(myrobot.time,myrobot.xdot,'-k.', 'MarkerSize',2);
+            myrobot.plot2 = plot(myrobot.time,myrobot.xdot,'-k.', 'MarkerSize',2);
             axis([0 10 -3 3]);
             
             %-------------------Plot y(m) vs t(s)--------------------------
             nexttile(5)
             hold on;
-            plot(myrobot.time,myrobot.y,'-k.', 'MarkerSize',2);
+            myrobot.plot3 = plot(myrobot.time,myrobot.y,'-k.', 'MarkerSize',2);
             axis([0 10 0 inf]);
             
             %-------------------Plot Q(rad) vs t(s)--------------------------
             nexttile(6)
             hold on;
-            plot(myrobot.time,myrobot.angle,'-k.', 'MarkerSize',2);
+            myrobot.plot4 = plot(myrobot.time,myrobot.angle,'-k.', 'MarkerSize',2);
             axis([0 10 -pi 0]);
             
         end
@@ -117,29 +121,29 @@ classdef MyRobot
             nexttile(3)
             hold on;
             title("x vs t");
-            plot(myrobot.time,myrobot.x,'-k.', 'MarkerSize',2);
-            axis([0 10 -1 25]);
+            set(myrobot.plot1,'XData',[get(myrobot.plot1,'XData'),myrobot.time],'YData',[get(myrobot.plot1,'YData'),myrobot.x])
+            %axis([0 10 -1 25]);
             
             %-------------------Plot xdot(m/s) vs t(s)--------------------------
             nexttile(4)
             hold on;
             title("x' vs t");
-            plot(myrobot.time,myrobot.xdot,'-k.', 'MarkerSize',2);
-            axis([0 10 -3 3]);
+            set(myrobot.plot2,'XData',[get(myrobot.plot2,'XData'),myrobot.time],'YData',[get(myrobot.plot2,'YData'),myrobot.xdot])
+            %axis([0 10 -3 3]);
             
             %-------------------Plot y(m) vs t(s)--------------------------
             nexttile(5)
             hold on;
             title("y vs t");
-            plot(myrobot.time,myrobot.y,'-k.', 'MarkerSize',2);
-            axis([0 10 0 inf]);
+            set(myrobot.plot3,'XData',[get(myrobot.plot3,'XData'),myrobot.time],'YData',[get(myrobot.plot3,'YData'),myrobot.y])
+            %axis([0 10 0 inf]);
             
             %-------------------Plot Q(rad) vs t(s)--------------------------
             nexttile(6)
             hold on;
             title("Q vs t");
-            plot(myrobot.time,myrobot.angle,'-k.', 'MarkerSize',2);
-            axis([0 10 -pi 0]);
+            set(myrobot.plot4,'XData',[get(myrobot.plot4,'XData'),myrobot.time],'YData',[get(myrobot.plot4,'YData'),myrobot.angle])
+            %axis([0 10 -pi 0]);
             
         end
         
