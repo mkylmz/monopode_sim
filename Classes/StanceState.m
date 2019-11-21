@@ -23,9 +23,9 @@ classdef StanceState
             %calcCartesianCoordinates Summary of this method goes here
             %   Detailed explanation goes here
             x = landx + (sstate.r+myrobot.radius)*cos(sstate.Q);
-            xdot = sstate.rdot*cos(sstate.Q) + sstate.Qdot*sin(sstate.Q);
+            xdot = sstate.rdot*cos(sstate.Q) - sstate.r*sstate.Qdot*sin(sstate.Q);
             y = landy + (sstate.r+myrobot.radius)*sin(sstate.Q);
-            ydot = sstate.rdot*sin(sstate.Q) - sstate.Qdot*cos(sstate.Q);
+            ydot = sstate.rdot*sin(sstate.Q) + sstate.r*sstate.Qdot*cos(sstate.Q);
             tstate = FlightState(x, xdot, y, ydot);
         end
     end

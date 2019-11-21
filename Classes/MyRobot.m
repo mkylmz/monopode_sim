@@ -156,9 +156,9 @@ classdef MyRobot
             %get_sstate Summary of this method goes here
             %   Detailed explanation goes here
             myrobot.x = landx + (sstate.r+myrobot.radius)*cos(sstate.Q);
-            myrobot.xdot = sstate.rdot*cos(sstate.Q) + sstate.Qdot*sin(sstate.Q);
+            myrobot.xdot = sstate.rdot*cos(sstate.Q) - sstate.r*sstate.Qdot*sin(sstate.Q);
             myrobot.y = landy + (sstate.r+myrobot.radius)*sin(sstate.Q);
-            myrobot.ydot = sstate.rdot*sin(sstate.Q) - sstate.Qdot*cos(sstate.Q);
+            myrobot.ydot = sstate.rdot*sin(sstate.Q) + sstate.r*sstate.Qdot*cos(sstate.Q);
             myrobot.angle = -pi+sstate.Q;
             myrobot.cur_length = sstate.r; 
         end

@@ -2,10 +2,10 @@ clear;
 clc;
 clf;
 
-init_x = 0; init_xdot = 0; init_y = 3; init_ydot = 0; init_radius = 0.5;
-init_leg_length = 1; init_m=16; init_b=0; init_k=1500; init_time = 0;
-kxdot = 0.008; xdotdesired = 5;
-desired_angle = real(asin( (kxdot * (init_xdot - xdotdesired))/init_leg_length ))-pi/2;
+init_x = 0; init_xdot = 1; init_y = 3; init_ydot = 0; init_radius = 0.5;
+init_leg_length = 1; init_m=16; init_b=0; init_k=6000; init_time = 0; init_T=pi*sqrt(init_m/init_k)/2;
+kxdot = 0.1; xdotdesired = 1;
+desired_angle = forward_angle(init_xdot,init_T,kxdot,xdotdesired,init_xdot,init_leg_length );
 mode = 0;
 step_time = 0.02;
 time_span = 0:step_time:10;
@@ -41,7 +41,7 @@ while (1)
             pause(step_time);
         end
         tstate = calcCartesianCoordinates(sstates(i),myrobot,tstate(5),tstate(6));
-        desired_angle = real(asin( (tstate.xdot*count*step_time/2 +kxdot * (tstate.xdot - xdotdesired))/myrobot.leg_length ))-pi/2;
+        desired_angle = forward_angle(tstate.xdot,count*step_time,kxdot,xdotdesired,tstate.xdot,myrobot.leg_length );
         mode = 0;
     end
 end
@@ -92,4 +92,8 @@ function sstates = sstate_converter(arr,count)
         sstates(i).Q = arr(i,3);
         sstates(i).Qdot = arr(i,4);
     end
+end
+
+function desired_angle = forward_angle(xdot_avg,T,kxdot,xdotdesired,xdot,r)
+        desired_angle = real(asin( (xdot_avg*T/2 +kxdot * (xdot - xdotdesired))/r))-pi/2;
 end
