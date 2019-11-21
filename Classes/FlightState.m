@@ -22,7 +22,7 @@ classdef FlightState
         function tstate = calcPolarCoordinates(fstate,myrobot)
             %calcPolarCoordinates Summary of this method goes here
             %   Detailed explanation goes here
-            rdot = fstate.xdot*cos(myrobot.angle) - fstate.ydot*sin(myrobot.angle);
+            rdot = - fstate.xdot*cos(myrobot.angle) - fstate.ydot*sin(myrobot.angle);
             qdot = - fstate.ydot*cos(myrobot.angle) + fstate.xdot*sin(myrobot.angle);
             landx = fstate.x+(myrobot.leg_length+myrobot.radius)*cos(myrobot.angle);
             landy = fstate.y+(myrobot.leg_length+myrobot.radius)*sin(myrobot.angle);
