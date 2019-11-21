@@ -1,9 +1,10 @@
 clear;
 clc;
+clf;
 
 init_x = 0; init_xdot = 0; init_y = 3; init_ydot = 0; init_radius = 0.5;
-init_leg_length = 1; init_m=40; init_b=0; init_k=10000; init_time = 0;
-kxdot = 0.08; xdotdesired = 1;
+init_leg_length = 1; init_m=16; init_b=0; init_k=1500; init_time = 0;
+kxdot = 0.008; xdotdesired = 5;
 desired_angle = real(asin( (kxdot * (init_xdot - xdotdesired))/init_leg_length ))-pi/2;
 mode = 0;
 step_time = 0.02;
@@ -54,9 +55,9 @@ function dpos = flight_func(t,state)
 end
 
 function [value, isterminal, direction] = LandingEvent(t, state, myrobot,angle)
-    value      = (state(3) < (myrobot.leg_length+myrobot.radius)*-sin(angle)) && state(4) < 0;
+    value      = state(3) - (myrobot.leg_length+myrobot.radius)*(-sin(angle));
     isterminal = 1;
-    direction  = 0;
+    direction  = -1;
 end
 
 function dstate = stance(t,state,myrobot)
@@ -68,9 +69,9 @@ function dstate = stance(t,state,myrobot)
 end
 
 function [value, isterminal, direction] = TakeoffEvent(t, state, myrobot)
-    value      = (state(1) > myrobot.leg_length);
+    value      = state(1) - myrobot.leg_length;
     isterminal = 1;
-    direction  = 0;
+    direction  = 1;
 end
 
 function fstates = fstate_converter(arr,count)
