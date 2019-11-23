@@ -2,9 +2,9 @@ clear;
 clc;
 clf;
 
-init_x = 0; init_xdot = 2; init_y = 2; init_ydot = 0; init_radius = 0.5;
+init_x = 0; init_xdot = 0; init_y = 2; init_ydot = 0; init_radius = 0.5;
 init_leg_length = 1; init_m=16; init_b=0; init_k=6000; init_time = 0; init_T=pi*sqrt(init_m/init_k)/2;
-kxdot = 0.1; xdotdesired = 2;
+kxdot = 0.1; xdotdesired = 1;
 desired_angle = forward_angle(init_xdot,init_T,kxdot,xdotdesired,init_xdot,init_leg_length );
 mode = 0;
 step_time = 0.02;

@@ -46,7 +46,8 @@ classdef MyRobot
         
         function myrobot = start(myrobot)
             figure(1);
-            set(gcf,'Position',[200 100 1040 1100])
+            set(gcf, 'WindowState', 'maximized');
+
             
             % Split figure plots
             tiledlayout(6,1)
@@ -65,31 +66,31 @@ classdef MyRobot
             end_point = [leg_pos(1)+myrobot.cur_length*cos(myrobot.angle) leg_pos(2)+myrobot.cur_length*sin(myrobot.angle)];
             myrobot.Leg_obj = plot([leg_pos(1) end_point(1)], [leg_pos(2) end_point(2)],'color','black');
             %Better View
-            axis([-1 25 -1 10]);
+            axis([-1 50 -1 10]);
             
             %-------------------Plot x(m) vs t(s)--------------------------
             nexttile(3)
             hold on;
             myrobot.plot1 = plot(myrobot.time,myrobot.x,'-k.', 'MarkerSize',2);
-            axis([0 10 -1 25]);
+            axis([0 20 -1 50]);
             
             %-------------------Plot xdot(m/s) vs t(s)--------------------------
             nexttile(4)
             hold on;
             myrobot.plot2 = plot(myrobot.time,myrobot.xdot,'-k.', 'MarkerSize',2);
-            axis([0 10 -3 3]);
+            axis([0 20 -3 inf]);
             
             %-------------------Plot y(m) vs t(s)--------------------------
             nexttile(5)
             hold on;
             myrobot.plot3 = plot(myrobot.time,myrobot.y,'-k.', 'MarkerSize',2);
-            axis([0 10 0 inf]);
+            axis([0 20 0 inf]);
             
             %-------------------Plot Q(rad) vs t(s)--------------------------
             nexttile(6)
             hold on;
             myrobot.plot4 = plot(myrobot.time,myrobot.angle,'-k.', 'MarkerSize',2);
-            axis([0 10 -pi 0]);
+            axis([0 20 -pi 0]);
             
         end
         
@@ -115,7 +116,7 @@ classdef MyRobot
             end_point = [leg_pos(1)+myrobot.cur_length*cos(myrobot.angle) leg_pos(2)+myrobot.cur_length*sin(myrobot.angle)];
             myrobot.Leg_obj = plot([leg_pos(1) end_point(1)], [leg_pos(2) end_point(2)],'color','black');
             %Better View
-            axis([-1 25 -1 10]);
+            %axis([-1 50 -1 10]);
             
             %-------------------Plot x(m) vs t(s)--------------------------
             nexttile(3)
